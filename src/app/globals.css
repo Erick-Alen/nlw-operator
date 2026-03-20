@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-page: #0a0a0a;
+  --bg-surface: #0f0f0f;
+  --bg-elevated: #1a1a1a;
+  --bg-input: #111111;
+  --text-primary: #fafafa;
+  --text-secondary: #6b7280;
+  --text-tertiary: #4b5563;
+  --text-muted: #525252;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-amber: #f59e0b;
+  --accent-cyan: #06b6d4;
+  --border-primary: #2a2a2a;
+  --border-secondary: #252525;
+  --border-focus: #10b981;
+  --syn-function: #ffc799;
+  --syn-keyword: #a0a0a0;
+  --syn-string: #99ffe4;
+  --syn-variable: #ffffff;
+  --syn-operator: #a0a0a0;
+  --syn-number: #ffc799;
+  --syn-type: #ffc799;
+  --syn-property: #a0a0a0;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg-page: var(--bg-page);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-input: var(--bg-input);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-muted: var(--text-muted);
+  --color-accent-green: var(--accent-green);
+  --color-accent-red: var(--accent-red);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-border-primary: var(--border-primary);
+  --color-border-secondary: var(--border-secondary);
+  --color-border-focus: var(--border-focus);
+  --color-syn-function: var(--syn-function);
+  --color-syn-keyword: var(--syn-keyword);
+  --color-syn-string: var(--syn-string);
+  --color-syn-variable: var(--syn-variable);
+  --color-syn-operator: var(--syn-operator);
+  --color-syn-number: var(--syn-number);
+  --color-syn-type: var(--syn-type);
+  --color-syn-property: var(--syn-property);
+  --font-primary: "JetBrains Mono", monospace;
+  --font-secondary: "IBM Plex Mono", monospace;
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
-  color: var(--foreground);
-  background: var(--background);
+  font-family: var(--font-primary);
+  color: var(--text-primary);
+  background: var(--bg-page);
 }
