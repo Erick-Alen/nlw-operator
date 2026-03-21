@@ -14,15 +14,16 @@ export function Toggle({ checked, className, label, ...props }: ToggleProps) {
       <Switch.Root
         checked={checked}
         className={cn(
-          "flex h-[22px] w-10 items-center rounded-full p-[3px] transition-colors",
-          "data-[checked]:justify-end data-[checked]:bg-accent-green data-[unchecked]:bg-border-primary",
+          "flex h-[22px] w-10 cursor-pointer items-center rounded-full p-[3px] transition-colors duration-200",
+          "data-[checked]:bg-accent-green data-[unchecked]:bg-border-primary",
           className
         )}
         {...props}
       >
         <Switch.Thumb
           className={cn(
-            "size-4 rounded-full transition-colors",
+            "size-4 rounded-full transition-all duration-200",
+            "data-[checked]:translate-x-[18px] data-[unchecked]:translate-x-0",
             "data-[checked]:bg-bg-page data-[unchecked]:bg-text-secondary"
           )}
         />

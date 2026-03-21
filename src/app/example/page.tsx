@@ -25,7 +25,6 @@ import {
   LeaderboardRowScore,
 } from "../components/ui/leaderboard-row";
 import {
-  Navbar,
   NavbarLink,
   NavbarLogo,
   NavbarRoot,
@@ -95,8 +94,6 @@ async function CodeBlockComposedDemo() {
 export default function ExamplePage() {
   return (
     <div className="flex min-h-screen flex-col bg-bg-page">
-      <Navbar links={[{ href: "/example", label: "leaderboard" }]} />
-
       <main className="mx-auto flex w-full max-w-4xl flex-col gap-16 px-8 py-12">
         <div className="flex flex-col gap-2">
           <h1 className="font-bold font-primary text-3xl text-text-primary">

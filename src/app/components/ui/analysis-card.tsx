@@ -9,7 +9,7 @@ const cardVariants = cva(
   {
     variants: {
       size: {
-        default: "w-[480px]",
+        default: "w-120",
         full: "w-full",
       },
     },

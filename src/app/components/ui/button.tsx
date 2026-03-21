@@ -5,15 +5,15 @@ import type { ComponentProps } from "react";
 import { cn } from "./cn";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center font-medium font-primary transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-green focus-visible:-outline-offset-1 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
+  "inline-flex cursor-pointer items-center justify-center font-medium font-primary transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-green focus-visible:-outline-offset-1 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
   {
     variants: {
       variant: {
         primary:
-          "bg-accent-green px-6 py-2.5 font-medium text-[13px] text-bg-page",
+          "bg-accent-green px-6 py-2.5 font-medium text-[13px] text-bg-page hover:bg-accent-green/80",
         secondary:
-          "border border-border-primary px-4 py-2 text-text-primary text-xs",
-        link: "border border-border-primary px-3 py-1.5 text-text-secondary text-xs",
+          "border border-border-primary px-4 py-2 text-text-primary text-xs hover:bg-bg-elevated",
+        link: "border border-border-primary px-3 py-1.5 text-text-secondary text-xs hover:border-text-tertiary hover:text-text-primary",
       },
     },
     defaultVariants: {
