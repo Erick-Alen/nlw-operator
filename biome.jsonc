@@ -238,7 +238,7 @@
         "noNamespace": "error",
         "noNegationElse": "error",
         "noNestedTernary": "error",
-        "noNonNullAssertion": "error",
+        "noNonNullAssertion": "off",
         "noParameterAssign": "error",
         "noParameterProperties": "error",
         "noRestrictedGlobals": "error",
@@ -558,6 +558,35 @@
       "json": {
         "parser": {
           "allowTrailingCommas": true
+        }
+      }
+    },
+    {
+      // Drizzle ORM requires barrel exports and namespace imports
+      "includes": ["**/src/db/**"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noBarrelFile": "off",
+            "noNamespaceImport": "off"
+          }
+        }
+      }
+    },
+    {
+      // Seed scripts use console and have relaxed complexity
+      "includes": ["**/src/db/seed.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveCognitiveComplexity": "off"
+          },
+          "suspicious": {
+            "noTemplateCurlyInString": "off"
+          },
+          "style": {
+            "noNestedTernary": "off"
+          }
         }
       }
     },
