@@ -11,6 +11,7 @@ import { Button } from "../components/ui/button";
 import {
   CodeBlock,
   CodeBlockBody,
+  CodeBlockDots,
   CodeBlockHeader,
   CodeBlockMeta,
   CodeBlockRoot,
@@ -84,6 +85,7 @@ async function CodeBlockComposedDemo() {
   return (
     <CodeBlockRoot>
       <CodeBlockHeader>
+        <CodeBlockDots />
         <CodeBlockMeta>custom header · 1 line</CodeBlockMeta>
       </CodeBlockHeader>
       <CodeBlockBody html={html} />

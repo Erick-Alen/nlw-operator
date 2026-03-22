@@ -25,6 +25,16 @@ export function CodeBlockRoot({
   );
 }
 
+export function CodeBlockDots() {
+  return (
+    <div className="flex gap-2">
+      <span className="size-3 rounded-full bg-accent-red" />
+      <span className="size-3 rounded-full bg-accent-amber" />
+      <span className="size-3 rounded-full bg-accent-green" />
+    </div>
+  );
+}
+
 export function CodeBlockHeader({
   className,
   children,
@@ -38,11 +48,6 @@ export function CodeBlockHeader({
       )}
       {...props}
     >
-      <div className="flex gap-2">
-        <span className="size-3 rounded-full bg-accent-red" />
-        <span className="size-3 rounded-full bg-accent-amber" />
-        <span className="size-3 rounded-full bg-accent-green" />
-      </div>
       {children}
     </div>
   );
@@ -111,6 +116,7 @@ export async function CodeBlock({
   return (
     <CodeBlockRoot className={className} {...props}>
       <CodeBlockHeader>
+        <CodeBlockDots />
         <CodeBlockMeta>
           {`lang: ${language} · ${String(displayLineCount)} lines`}
         </CodeBlockMeta>
