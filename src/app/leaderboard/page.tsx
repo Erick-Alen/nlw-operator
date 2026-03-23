@@ -1,5 +1,6 @@
 import type { BundledLanguage } from "shiki";
 import { codeToHtml } from "shiki";
+import { caller } from "@/trpc/server";
 import {
   CodeBlockBody,
   CodeBlockHeader,
@@ -7,57 +8,15 @@ import {
   CodeBlockRoot,
 } from "../components/ui/code-block";
 
-interface LeaderboardEntry {
+interface EntryCardProps {
   code: string;
   language: BundledLanguage;
+  lineCount: number;
   rank: number;
-  score: number;
+  score: string;
 }
 
-const entries: LeaderboardEntry[] = [
-  {
-    rank: 1,
-    score: 1.2,
-    language: "javascript",
-    code: `eval(prompt("enter code"))
-document.write(response)
-// trust the user lol`,
-  },
-  {
-    rank: 2,
-    score: 1.8,
-    language: "typescript",
-    code: `if (x == true) { return true; }
-else if (x == false) { return false; }
-else { return !false; }`,
-  },
-  {
-    rank: 3,
-    score: 2.1,
-    language: "sql",
-    code: `SELECT * FROM users WHERE 1=1
--- TODO: add authentication`,
-  },
-  {
-    rank: 4,
-    score: 2.3,
-    language: "java",
-    code: `catch (e) {
-  // ignore
-}`,
-  },
-  {
-    rank: 5,
-    score: 2.5,
-    language: "javascript",
-    code: `const sleep = (ms) =>
-  new Date(Date.now() + ms)
-  while(new Date() < end) {}`,
-  },
-];
-
-async function EntryCard({ entry }: { entry: LeaderboardEntry }) {
-  const lines = entry.code.split("\n");
+async function EntryCard({ entry }: { entry: EntryCardProps }) {
   const html = await codeToHtml(entry.code, {
     lang: entry.language,
     theme: "vesper",
@@ -85,7 +44,7 @@ async function EntryCard({ entry }: { entry: LeaderboardEntry }) {
             {entry.language}
           </CodeBlockMeta>
           <CodeBlockMeta>
-            {lines.length} {lines.length === 1 ? "line" : "lines"}
+            {entry.lineCount} {entry.lineCount === 1 ? "line" : "lines"}
           </CodeBlockMeta>
         </div>
       </CodeBlockHeader>
@@ -96,6 +55,8 @@ async function EntryCard({ entry }: { entry: LeaderboardEntry }) {
 }
 
 export default async function LeaderboardPage() {
+  const entries = await caller.leaderboard.getTop({ limit: 10 });
+
   return (
     <main className="flex flex-col px-20 py-10">
       {/* Hero */}
@@ -113,19 +74,35 @@ export default async function LeaderboardPage() {
         </p>
         <div className="flex items-center gap-2">
           <span className="font-secondary text-text-tertiary text-xs">
-            2,847 submissions
+            {entries.length} submissions
           </span>
           <span className="font-secondary text-text-tertiary text-xs">·</span>
           <span className="font-secondary text-text-tertiary text-xs">
-            avg score: 4.2/10
+            avg score:{" "}
+            {entries.length > 0
+              ? (
+                  entries.reduce((sum, e) => sum + Number(e.score), 0) /
+                  entries.length
+                ).toFixed(1)
+              : "0"}
+            /10
           </span>
         </div>
       </section>
 
       {/* Entries */}
       <section className="mt-10 flex flex-col gap-5">
-        {entries.map((entry) => (
-          <EntryCard entry={entry} key={entry.rank} />
+        {entries.map((entry, i) => (
+          <EntryCard
+            entry={{
+              rank: i + 1,
+              score: entry.score,
+              language: entry.language as BundledLanguage,
+              code: entry.code,
+              lineCount: entry.lineCount,
+            }}
+            key={entry.id}
+          />
         ))}
       </section>
     </main>

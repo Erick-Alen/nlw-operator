@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, JetBrains_Mono } from "next/font/google";
+import { TRPCReactProvider } from "@/trpc/client";
 import { Navbar } from "./components/ui/navbar";
 import "./globals.css";
 
@@ -30,8 +31,10 @@ export default function RootLayout({
       <body
         className={`${jetbrainsMono.variable} ${ibmPlexMono.variable} min-h-screen bg-bg-page antialiased`}
       >
-        <Navbar links={[{ href: "/leaderboard", label: "leaderboard" }]} />
-        {children}
+        <TRPCReactProvider>
+          <Navbar links={[{ href: "/leaderboard", label: "leaderboard" }]} />
+          {children}
+        </TRPCReactProvider>
       </body>
     </html>
   );

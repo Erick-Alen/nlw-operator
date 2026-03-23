@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Button } from "./components/ui/button";
 import {
   LeaderboardRowCode,
@@ -8,6 +9,8 @@ import {
   LeaderboardRowScore,
 } from "./components/ui/leaderboard-row";
 import { HomeEditorSection } from "./home-actions";
+import { HomeStatsSkeleton } from "./home-stats";
+import { HomeStatsLoader } from "./home-stats-loader";
 
 export default function Home() {
   return (
@@ -30,9 +33,9 @@ export default function Home() {
         <HomeEditorSection />
 
         {/* Footer stats */}
-        <p className="font-secondary text-sm text-text-tertiary">
-          2,847 codes roasted · avg score: 4.2/10
-        </p>
+        <Suspense fallback={<HomeStatsSkeleton />}>
+          <HomeStatsLoader />
+        </Suspense>
       </section>
 
       {/* Leaderboard preview */}
@@ -104,7 +107,7 @@ export default function Home() {
         </div>
 
         <p className="text-center font-secondary text-text-tertiary text-xs">
-          {"showing top 3 of 2,847 · "}
+          {"showing top 3 · "}
           <Link
             className="transition-colors duration-200 hover:text-text-secondary"
             href="/leaderboard"
