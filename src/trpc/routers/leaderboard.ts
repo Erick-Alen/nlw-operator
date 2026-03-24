@@ -27,4 +27,20 @@ export const leaderboardRouter = createTRPCRouter({
       avgScore: Number(result.avgScore ?? 0),
     };
   }),
+
+  getShamePreview: baseProcedure.query(async ({ ctx }) => {
+    const [entries, [stats]] = await Promise.all([
+      ctx.db
+        .select()
+        .from(submissions)
+        .orderBy(asc(submissions.score))
+        .limit(3),
+      ctx.db.select({ totalCount: count() }).from(submissions),
+    ]);
+
+    return {
+      entries,
+      totalCount: stats.totalCount,
+    };
+  }),
 });
