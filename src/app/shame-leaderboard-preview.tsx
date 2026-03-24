@@ -85,7 +85,7 @@ export function ShameLeaderboardPreview({
               </LeaderboardRowRank>
 
               {/* Score */}
-              <LeaderboardRowScore className="w-[60px]">
+              <LeaderboardRowScore>
                 {Number(entry.score).toFixed(1)}
               </LeaderboardRowScore>
 
@@ -173,6 +173,7 @@ export function ShameLeaderboardSkeleton() {
             <div className="flex flex-1 flex-col gap-[3px]">
               <div className="h-3 w-3/4 animate-pulse rounded bg-bg-elevated" />
               <div className="h-3 w-1/2 animate-pulse rounded bg-bg-elevated" />
+              <div className="h-3 w-1/3 animate-pulse rounded bg-bg-elevated" />
             </div>
             <div className="h-3 w-[80px] animate-pulse rounded bg-bg-elevated" />
           </div>
