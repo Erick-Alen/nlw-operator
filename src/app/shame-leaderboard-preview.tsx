@@ -23,6 +23,10 @@ export function ShameLeaderboardPreview({
   entries,
   totalCount,
 }: ShameLeaderboardPreviewProps) {
+  if (entries.length === 0) {
+    return null;
+  }
+
   return (
     <section className="mt-20 flex w-full max-w-[960px] flex-col gap-6">
       {/* Section header */}
@@ -86,7 +90,7 @@ export function ShameLeaderboardPreview({
 
               {/* Score */}
               <LeaderboardRowScore>
-                {Number(entry.score).toFixed(1)}
+                {Number(entry.score ?? 0).toFixed(1)}
               </LeaderboardRowScore>
 
               {/* Code preview — up to 3 lines stacked */}
