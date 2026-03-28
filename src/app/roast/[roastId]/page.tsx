@@ -1,7 +1,8 @@
+import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import type { BundledLanguage } from "shiki";
-import { codeToHtml } from "shiki";
-import { caller } from "@/trpc/server";
+import { cachedHighlight } from "@/app/lib/cached-highlight";
+import { staticCaller } from "@/trpc/server";
 import { AnalysisCard } from "../../components/ui/analysis-card";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
@@ -43,18 +44,16 @@ function Divider() {
   return <div className="h-px w-full bg-border-primary" />;
 }
 
-// --- Page ---
+// --- Cached content component ---
 
-export default async function RoastResultsPage({
-  params,
-}: {
-  params: Promise<{ roastId: string }>;
-}) {
-  const { roastId } = await params;
+async function CachedRoastContent({ roastId }: { roastId: string }) {
+  "use cache";
+  cacheLife("static");
+  cacheTag(`roast-${roastId}`);
 
-  let roast: Awaited<ReturnType<typeof caller.submission.getById>>;
+  let roast: Awaited<ReturnType<typeof staticCaller.submission.getById>>;
   try {
-    roast = await caller.submission.getById({ id: roastId });
+    roast = await staticCaller.submission.getById({ id: roastId });
   } catch {
     notFound();
   }
@@ -63,10 +62,7 @@ export default async function RoastResultsPage({
   const severity = verdictSeverityMap[roast.verdict] ?? "warning";
   const language = roast.language as BundledLanguage;
 
-  const html = await codeToHtml(roast.code, {
-    lang: language,
-    theme: "vesper",
-  });
+  const html = await cachedHighlight(roast.code, language);
 
   return (
     <main className="flex flex-col gap-10 px-20 py-10">
@@ -170,4 +166,15 @@ export default async function RoastResultsPage({
       )}
     </main>
   );
+}
+
+// --- Page ---
+
+export default async function RoastResultsPage({
+  params,
+}: {
+  params: Promise<{ roastId: string }>;
+}) {
+  const { roastId } = await params;
+  return <CachedRoastContent roastId={roastId} />;
 }

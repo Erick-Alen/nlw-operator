@@ -1,7 +1,12 @@
-import { caller } from "@/trpc/server";
+import { cacheLife, cacheTag } from "next/cache";
+import { staticCaller } from "@/trpc/server";
 import { HomeStats } from "./home-stats";
 
 export async function HomeStatsLoader() {
-  const stats = await caller.leaderboard.getStats();
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("leaderboard");
+
+  const stats = await staticCaller.leaderboard.getStats();
   return <HomeStats avgScore={stats.avgScore} totalCount={stats.totalCount} />;
 }

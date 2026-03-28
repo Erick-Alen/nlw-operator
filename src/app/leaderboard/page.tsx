@@ -1,7 +1,8 @@
+import { cacheLife, cacheTag } from "next/cache";
 import { Suspense } from "react";
 import type { BundledLanguage } from "shiki";
-import { codeToHtml } from "shiki";
-import { caller } from "@/trpc/server";
+import { cachedHighlight } from "@/app/lib/cached-highlight";
+import { staticCaller } from "@/trpc/server";
 import {
   CodeBlockHeader,
   CodeBlockMeta,
@@ -20,10 +21,7 @@ interface EntryCardProps {
 }
 
 async function EntryCard({ entry }: { entry: EntryCardProps }) {
-  const html = await codeToHtml(entry.code, {
-    lang: entry.language,
-    theme: "vesper",
-  });
+  const html = await cachedHighlight(entry.code, entry.language);
 
   return (
     <CodeBlockRoot>
@@ -88,7 +86,11 @@ function EntryCardSkeleton() {
 // --- Loader ---
 
 async function LeaderboardEntriesLoader() {
-  const entries = await caller.leaderboard.getTop({ limit: 10 });
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("leaderboard");
+
+  const entries = await staticCaller.leaderboard.getTop({ limit: 10 });
 
   const avgScore =
     entries.length > 0
