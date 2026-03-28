@@ -8,7 +8,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { roastModeEnum, verdictEnum } from "./enums";
+import { roastModeEnum, submissionStatusEnum, verdictEnum } from "./enums";
 
 export const submissions = pgTable(
   "submissions",
@@ -20,10 +20,11 @@ export const submissions = pgTable(
     lineCount: integer("line_count").notNull(),
 
     roastMode: roastModeEnum("roast_mode").notNull().default("roast"),
+    status: submissionStatusEnum("status").notNull().default("done"),
 
-    score: numeric("score", { precision: 3, scale: 1 }).notNull(),
-    verdict: verdictEnum("verdict").notNull(),
-    roastQuote: text("roast_quote").notNull(),
+    score: numeric("score", { precision: 3, scale: 1 }),
+    verdict: verdictEnum("verdict"),
+    roastQuote: text("roast_quote"),
 
     shareToken: text("share_token"),
 
@@ -36,5 +37,6 @@ export const submissions = pgTable(
     index("idx_submissions_created_at").on(table.createdAt),
     uniqueIndex("idx_submissions_share_token").on(table.shareToken),
     index("idx_submissions_language").on(table.language),
+    index("idx_submissions_status").on(table.status),
   ]
 );

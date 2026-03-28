@@ -22,3 +22,9 @@ export const diffLineTypeEnum = pgEnum("diff_line_type", [
   "removed",
   "context",
 ]);
+
+export const submissionStatusEnum = pgEnum("submission_status", [
+  "pending",
+  "done",
+  "failed",
+]);
