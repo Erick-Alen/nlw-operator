@@ -33,7 +33,7 @@ const roastOutputSchema = z.object({
     .array(
       z.object({
         severity: z.enum(["critical", "warning", "good"]),
-        title: z.string().describe("Short issue title, max 50 chars"),
+        title: z.string().max(50).describe("Short issue title, max 50 chars"),
         description: z
           .string()
           .describe("Actionable explanation, 1-2 sentences"),
