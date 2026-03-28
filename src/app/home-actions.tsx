@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useTransition } from "react";
 import type { BundledLanguage } from "shiki/bundle/web";
+import { submitCode } from "@/app/actions/submit";
 import { Button } from "./components/ui/button";
 import { CodeEditor } from "./components/ui/code-editor";
 import { Toggle } from "./components/ui/toggle";
@@ -43,6 +45,8 @@ const defaultCode = `function calculateTotal(items) {
 }`;
 
 export function HomeEditorSection() {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [code, setCode] = useState(defaultCode);
   const [language, setLanguage] = useState<BundledLanguage>("javascript");
   const [roastMode, setRoastMode] = useState(true);
@@ -51,11 +55,21 @@ export function HomeEditorSection() {
   const isOverLimit = lineCount > MAX_LINES;
 
   const bottomMessage = useMemo(() => {
+    if (isPending) {
+      return "// analyzing your code...";
+    }
     if (isOverLimit) {
       return pickOverLimitPhrase(lineCount);
     }
     return "// maximum sarcasm enabled";
-  }, [isOverLimit, lineCount]);
+  }, [isPending, isOverLimit, lineCount]);
+
+  function handleSubmit() {
+    startTransition(async () => {
+      const result = await submitCode({ code, language, roastMode });
+      router.push(`/roast/${result.id}`);
+    });
+  }
 
   return (
     <>
@@ -80,8 +94,12 @@ export function HomeEditorSection() {
             {bottomMessage}
           </span>
         </div>
-        <Button disabled={isEmpty || isOverLimit} variant="primary">
-          $ roast_my_code
+        <Button
+          disabled={isEmpty || isOverLimit || isPending}
+          onClick={handleSubmit}
+          variant="primary"
+        >
+          {isPending ? "$ analyzing..." : "$ roast_my_code"}
         </Button>
       </div>
     </>
