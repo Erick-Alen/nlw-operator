@@ -80,7 +80,7 @@ export function CodeBlockBody({
   return (
     <div
       className={cn(
-        "[&_code]:counter-reset-[line] [&_code_.line]:counter-increment-[line] [&_code_.line::before]:mr-4 [&_code_.line::before]:inline-block [&_code_.line::before]:w-6 [&_code_.line::before]:select-none [&_code_.line::before]:text-right [&_code_.line::before]:text-text-tertiary [&_code_.line::before]:content-[counter(line)] [&_pre]:bg-transparent! [&_pre]:p-4 [&_pre]:font-primary [&_pre]:text-[13px] [&_pre]:leading-6",
+        "[&_code]:[counter-reset:line] [&_code_.line::before]:mr-4 [&_code_.line::before]:inline-block [&_code_.line::before]:w-6 [&_code_.line::before]:select-none [&_code_.line::before]:text-right [&_code_.line::before]:text-text-tertiary [&_code_.line::before]:[content:counter(line)] [&_code_.line]:[counter-increment:line] [&_pre]:bg-transparent! [&_pre]:p-4 [&_pre]:font-primary [&_pre]:text-[13px] [&_pre]:leading-6",
         className
       )}
       // biome-ignore lint/security/noDangerouslySetInnerHtml: shiki generates safe pre-rendered HTML for syntax highlighting

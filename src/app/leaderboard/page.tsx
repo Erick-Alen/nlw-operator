@@ -2,11 +2,11 @@ import type { BundledLanguage } from "shiki";
 import { codeToHtml } from "shiki";
 import { caller } from "@/trpc/server";
 import {
-  CodeBlockBody,
   CodeBlockHeader,
   CodeBlockMeta,
   CodeBlockRoot,
 } from "../components/ui/code-block";
+import { ExpandableCode } from "../components/ui/expandable-code";
 
 interface EntryCardProps {
   code: string;
@@ -49,7 +49,7 @@ async function EntryCard({ entry }: { entry: EntryCardProps }) {
         </div>
       </CodeBlockHeader>
 
-      <CodeBlockBody className="max-h-[120px] overflow-hidden" html={html} />
+      <ExpandableCode html={html} lineCount={entry.lineCount} />
     </CodeBlockRoot>
   );
 }
@@ -99,7 +99,7 @@ export default async function LeaderboardPage() {
               score: entry.score,
               language: entry.language as BundledLanguage,
               code: entry.code,
-              lineCount: entry.lineCount,
+              lineCount: entry.lineCount || entry.code.split("\n").length,
             }}
             key={entry.id}
           />

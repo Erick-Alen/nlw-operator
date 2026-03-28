@@ -1,14 +1,13 @@
-// src/app/shame-leaderboard-preview.tsx
-
 import type { InferSelectModel } from "drizzle-orm";
 import Link from "next/link";
+import type { BundledLanguage } from "shiki";
+import { codeToHtml } from "shiki";
 import type { submissions } from "@/db/schema";
 import { Button } from "./components/ui/button";
 import { cn } from "./components/ui/cn";
+import { ExpandableCode } from "./components/ui/expandable-code";
 import {
-  LeaderboardRowLanguage,
   LeaderboardRowRank,
-  LeaderboardRowRoot,
   LeaderboardRowScore,
 } from "./components/ui/leaderboard-row";
 
@@ -18,6 +17,65 @@ interface ShameLeaderboardPreviewProps {
   entries: Submission[];
   totalCount: number;
 }
+
+// --- Internal async entry component ---
+
+interface ShameLeaderboardEntryProps {
+  entry: Submission;
+  isLast: boolean;
+  rank: number;
+}
+
+async function ShameLeaderboardEntry({
+  entry,
+  rank,
+  isLast,
+}: ShameLeaderboardEntryProps) {
+  const lineCount = entry.lineCount || entry.code.split("\n").length;
+
+  const html = await codeToHtml(entry.code, {
+    lang: entry.language as BundledLanguage,
+    theme: "vesper",
+  });
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col border-border-primary border-b",
+        isLast && "border-b-0"
+      )}
+    >
+      {/* Meta row */}
+      <div className="flex items-center gap-4 px-5 py-3">
+        <LeaderboardRowRank
+          className={cn(
+            "w-8 text-xs",
+            rank === 1 ? "font-bold text-accent-amber" : "text-text-secondary"
+          )}
+        >
+          {rank}
+        </LeaderboardRowRank>
+
+        <LeaderboardRowScore className="w-14 text-xs">
+          {Number(entry.score ?? 0).toFixed(1)}
+        </LeaderboardRowScore>
+
+        <span className="flex-1 font-primary text-text-tertiary text-xs">
+          {lineCount} {lineCount === 1 ? "line" : "lines"}
+        </span>
+
+        <span className="font-primary text-text-secondary text-xs">
+          {entry.language}
+        </span>
+      </div>
+
+      {/* Syntax-highlighted code, expandable */}
+      <ExpandableCode html={html} lineCount={lineCount} />
+    </div>
+  );
+}
+
+// --- Public component ---
 
 export function ShameLeaderboardPreview({
   entries,
@@ -48,69 +106,16 @@ export function ShameLeaderboardPreview({
         {"// the worst code on the internet, ranked by shame"}
       </p>
 
-      {/* Table */}
+      {/* Entries */}
       <div className="flex flex-col border border-border-primary">
-        {/* Header */}
-        <div className="flex items-center gap-6 border-border-primary border-b bg-bg-surface px-5 py-3">
-          <span className="w-10 font-primary text-text-tertiary text-xs">
-            #
-          </span>
-          <span className="w-[60px] font-primary text-text-tertiary text-xs">
-            score
-          </span>
-          <span className="flex-1 font-primary text-text-tertiary text-xs">
-            code
-          </span>
-          <span className="w-[100px] text-right font-primary text-text-tertiary text-xs">
-            lang
-          </span>
-        </div>
-
-        {/* Rows */}
-        {entries.map((entry, index) => {
-          const rank = index + 1;
-          const codeLines = entry.code.split("\n").slice(0, 3);
-          const isLast = index === entries.length - 1;
-
-          return (
-            <LeaderboardRowRoot
-              className={cn(isLast && "border-b-0")}
-              key={entry.id}
-            >
-              {/* Rank — amber for #1, secondary for others */}
-              <LeaderboardRowRank
-                className={cn(
-                  rank === 1
-                    ? "font-bold text-accent-amber"
-                    : "text-text-secondary"
-                )}
-              >
-                {rank}
-              </LeaderboardRowRank>
-
-              {/* Score */}
-              <LeaderboardRowScore>
-                {Number(entry.score ?? 0).toFixed(1)}
-              </LeaderboardRowScore>
-
-              {/* Code preview — up to 3 lines stacked */}
-              <div className="flex flex-1 flex-col gap-[3px] overflow-hidden">
-                {codeLines.map((line, i) => (
-                  <span
-                    className="truncate font-primary text-[12px] text-text-primary"
-                    // biome-ignore lint/suspicious/noArrayIndexKey: static preview lines, order never changes
-                    key={i}
-                  >
-                    {line}
-                  </span>
-                ))}
-              </div>
-
-              {/* Language */}
-              <LeaderboardRowLanguage>{entry.language}</LeaderboardRowLanguage>
-            </LeaderboardRowRoot>
-          );
-        })}
+        {entries.map((entry, index) => (
+          <ShameLeaderboardEntry
+            entry={entry}
+            isLast={index === entries.length - 1}
+            key={entry.id}
+            rank={index + 1}
+          />
+        ))}
       </div>
 
       {/* Footer hint */}
@@ -145,46 +150,30 @@ export function ShameLeaderboardSkeleton() {
 
       <div className="h-3 w-64 animate-pulse rounded bg-bg-elevated" />
 
-      {/* Table skeleton */}
+      {/* 3 skeleton entries */}
       <div className="flex flex-col border border-border-primary">
-        {/* Header row — static labels, not skeleton */}
-        <div className="flex items-center gap-6 border-border-primary border-b bg-bg-surface px-5 py-3">
-          <span className="w-10 font-primary text-text-tertiary text-xs">
-            #
-          </span>
-          <span className="w-[60px] font-primary text-text-tertiary text-xs">
-            score
-          </span>
-          <span className="flex-1 font-primary text-text-tertiary text-xs">
-            code
-          </span>
-          <span className="w-[100px] text-right font-primary text-text-tertiary text-xs">
-            lang
-          </span>
-        </div>
-
-        {/* 3 skeleton rows */}
         {[1, 2, 3].map((i) => (
           <div
             className={cn(
-              "flex items-center gap-6 border-border-primary px-5 py-4",
-              i < 3 && "border-b"
+              "flex flex-col border-border-primary border-b",
+              i === 3 && "border-b-0"
             )}
             key={i}
           >
-            <div className="h-3 w-10 animate-pulse rounded bg-bg-elevated" />
-            <div className="h-3 w-[60px] animate-pulse rounded bg-bg-elevated" />
-            <div className="flex flex-1 flex-col gap-[3px]">
-              <div className="h-3 w-3/4 animate-pulse rounded bg-bg-elevated" />
-              <div className="h-3 w-1/2 animate-pulse rounded bg-bg-elevated" />
-              <div className="h-3 w-1/3 animate-pulse rounded bg-bg-elevated" />
+            {/* Meta row skeleton */}
+            <div className="flex items-center gap-4 px-5 py-3">
+              <div className="h-3 w-8 animate-pulse rounded bg-bg-elevated" />
+              <div className="h-3 w-14 animate-pulse rounded bg-bg-elevated" />
+              <div className="h-3 w-16 animate-pulse rounded bg-bg-elevated" />
+              <div className="h-3 w-20 animate-pulse rounded bg-bg-elevated" />
             </div>
-            <div className="h-3 w-[80px] animate-pulse rounded bg-bg-elevated" />
+            {/* Code block skeleton */}
+            <div className="h-[120px] animate-pulse bg-bg-elevated" />
           </div>
         ))}
       </div>
 
-      {/* Footer hint skeleton */}
+      {/* Footer skeleton */}
       <div className="flex justify-center">
         <div className="h-3 w-56 animate-pulse rounded bg-bg-elevated" />
       </div>
