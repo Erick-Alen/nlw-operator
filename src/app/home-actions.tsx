@@ -50,6 +50,7 @@ export function HomeEditorSection() {
   const [code, setCode] = useState(defaultCode);
   const [language, setLanguage] = useState<BundledLanguage>("javascript");
   const [roastMode, setRoastMode] = useState(true);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const isEmpty = code.trim().length === 0;
   const lineCount = code.split("\n").length;
   const isOverLimit = lineCount > MAX_LINES;
@@ -65,9 +66,18 @@ export function HomeEditorSection() {
   }, [isPending, isOverLimit, lineCount]);
 
   function handleSubmit() {
+    setSubmitError(null);
     startTransition(async () => {
-      const result = await submitCode({ code, language, roastMode });
-      router.push(`/roast/${result.id}`);
+      try {
+        const result = await submitCode({ code, language, roastMode });
+        router.push(`/roast/${result.id}`);
+      } catch (err) {
+        setSubmitError(
+          err instanceof Error
+            ? err.message
+            : "something went wrong. try again."
+        );
+      }
     });
   }
 
@@ -102,6 +112,13 @@ export function HomeEditorSection() {
           {isPending ? "$ analyzing..." : "$ roast_my_code"}
         </Button>
       </div>
+
+      {submitError && (
+        <p className="font-secondary text-accent-red text-xs">
+          {"// "}
+          {submitError}
+        </p>
+      )}
     </>
   );
 }

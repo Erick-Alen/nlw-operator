@@ -15,7 +15,9 @@ const submitInputSchema = z.object({
   roastMode: z.boolean(),
 });
 
-export async function submitCode(rawInput: unknown) {
+export type SubmitInput = z.infer<typeof submitInputSchema>;
+
+export async function submitCode(rawInput: SubmitInput) {
   const input = submitInputSchema.parse(rawInput);
   const lineCount = input.code.split("\n").length;
 
