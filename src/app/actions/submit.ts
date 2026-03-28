@@ -79,8 +79,8 @@ export async function submitCode(rawInput: unknown) {
         .where(eq(submissions.id, submission.id));
 
       // Bust caches
-      revalidateTag("leaderboard");
-      revalidateTag(`roast-${submission.id}`);
+      revalidateTag("leaderboard", "max");
+      revalidateTag(`roast-${submission.id}`, "max");
     } catch {
       await db
         .update(submissions)
