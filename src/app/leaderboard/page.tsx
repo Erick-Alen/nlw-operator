@@ -118,7 +118,7 @@ async function LeaderboardEntriesLoader() {
           <EntryCard
             entry={{
               rank: i + 1,
-              score: entry.score,
+              score: entry.score ?? "0",
               language: entry.language as BundledLanguage,
               code: entry.code,
               lineCount: entry.lineCount || entry.code.split("\n").length,
