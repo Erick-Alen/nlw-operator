@@ -13,6 +13,7 @@ const roastOutputSchema = z.object({
     .number()
     .min(0)
     .max(10)
+    .multipleOf(0.1)
     .describe("Code quality score from 0 (worst) to 10 (best), one decimal"),
   verdict: z
     .enum([
@@ -26,6 +27,7 @@ const roastOutputSchema = z.object({
     .describe("Overall verdict label"),
   roastQuote: z
     .string()
+    .max(120)
     .describe("One punchy sentence summarizing the review. Max 120 chars."),
   issues: z
     .array(
@@ -54,6 +56,8 @@ const roastOutputSchema = z.object({
               .describe("Raw line content without diff prefix"),
           })
         )
+        .min(1)
+        .max(15)
         .describe("Unified diff lines for the suggested fix"),
     })
     .optional()
