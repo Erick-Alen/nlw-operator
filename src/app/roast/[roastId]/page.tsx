@@ -13,6 +13,7 @@ import {
 } from "../../components/ui/code-block";
 import { DiffLine } from "../../components/ui/diff-line";
 import { ScoreRing } from "../../components/ui/score-ring";
+import { RoastPendingView } from "./roast-pending-view";
 
 // --- Verdict → Badge severity mapping ---
 
@@ -55,6 +56,11 @@ async function CachedRoastContent({ roastId }: { roastId: string }) {
   try {
     roast = await staticCaller.submission.getById({ id: roastId });
   } catch {
+    notFound();
+  }
+
+  // Guard nullable AI fields — these are always populated when status is 'done'
+  if (!(roast.score && roast.verdict && roast.roastQuote)) {
     notFound();
   }
 
@@ -176,5 +182,35 @@ export default async function RoastResultsPage({
   params: Promise<{ roastId: string }>;
 }) {
   const { roastId } = await params;
+
+  // Status check — NOT cached, runs on every request
+  const statusResult = await staticCaller.submission.getStatusById({
+    id: roastId,
+  });
+
+  if (!statusResult) {
+    notFound();
+  }
+
+  if (statusResult.status === "pending") {
+    return <RoastPendingView />;
+  }
+
+  if (statusResult.status === "failed") {
+    return (
+      <main className="flex flex-col items-center justify-center gap-4 px-20 py-20">
+        <span className="font-bold font-primary text-3xl text-accent-red">
+          {">"}
+        </span>
+        <h1 className="font-bold font-primary text-text-primary text-xl">
+          roast_failed
+        </h1>
+        <p className="font-secondary text-sm text-text-secondary">
+          {"// the AI couldn't process your code. try again."}
+        </p>
+      </main>
+    );
+  }
+
   return <CachedRoastContent roastId={roastId} />;
 }
