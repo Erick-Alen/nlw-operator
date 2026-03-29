@@ -3,8 +3,6 @@ import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-export const dynamic = "force-dynamic";
-
 import type { BundledLanguage } from "shiki";
 import { cachedHighlight } from "@/app/lib/cached-highlight";
 import { staticCaller } from "@/trpc/server";
@@ -22,19 +20,17 @@ import { ShareButton } from "./share-button";
 
 // --- generateMetadata ---
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ roastId: string }>;
-}): Promise<Metadata> {
-  const { roastId } = await params;
+async function fetchRoastMeta(roastId: string) {
+  "use cache";
+  cacheLife("max");
+  cacheTag(`roast-${roastId}`);
 
   const statusResult = await staticCaller.submission
     .getStatusById({ id: roastId })
     .catch(() => null);
 
   if (!statusResult || statusResult.status !== "done") {
-    return {};
+    return null;
   }
 
   const roast = await staticCaller.submission
@@ -42,19 +38,33 @@ export async function generateMetadata({
     .catch(() => null);
 
   if (!(roast?.score && roast.verdict && roast.roastQuote)) {
+    return null;
+  }
+
+  return {
+    score: Number(roast.score).toFixed(1),
+    verdict: roast.verdict.replace(/_/g, " "),
+    roastQuote: roast.roastQuote,
+  };
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ roastId: string }>;
+}): Promise<Metadata> {
+  const { roastId } = await params;
+  const meta = await fetchRoastMeta(roastId);
+  if (!meta) {
     return {};
   }
 
-  const title = `${Number(roast.score).toFixed(1)}/10 · ${roast.verdict.replace(/_/g, " ")} — devroast`;
-  const description = roast.roastQuote;
+  const title = `${meta.score}/10 · ${meta.verdict} — devroast`;
 
   return {
     title,
-    description,
-    openGraph: {
-      title,
-      description,
-    },
+    description: meta.roastQuote,
+    openGraph: { title, description: meta.roastQuote },
   };
 }
 
