@@ -1,4 +1,6 @@
+import { eq } from "drizzle-orm";
 import { z } from "zod/v4";
+import { submissions } from "@/db/schema";
 import { baseProcedure, createTRPCRouter } from "../init";
 
 export const submissionRouter = createTRPCRouter({
@@ -26,5 +28,21 @@ export const submissionRouter = createTRPCRouter({
       }
 
       return result;
+    }),
+
+  getStatusById: baseProcedure
+    .input(z.object({ id: z.uuid() }))
+    .query(async ({ ctx, input }) => {
+      const result = await ctx.db
+        .select({
+          id: submissions.id,
+          status: submissions.status,
+          errorMessage: submissions.errorMessage,
+        })
+        .from(submissions)
+        .where(eq(submissions.id, input.id))
+        .limit(1);
+
+      return result[0] ?? null;
     }),
 });

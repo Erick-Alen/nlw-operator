@@ -1,0 +1,78 @@
+<h2>Submission Loading UX</h2>
+<p class="subtitle">
+  When the user clicks "$ roast_my_code", what happens while the AI is
+  analyzing? (~5–15s)
+</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Wait on home, then redirect</h3>
+      <p>
+        Button shows a spinner / "$ analyzing..." state. User stays on the home
+        page until the full AI response is ready, then gets redirected to
+        <code>/roast/[id]</code>. Simple, no intermediate page needed.
+      </p>
+      <div
+        style="margin-top:12px;padding:12px;background:#111;border:1px solid #2a2a2a;font-family:monospace;font-size:12px;color:#6b7280"
+      >
+        [home page]<br>
+        <span style="color:#10b981">$ analyzing...</span>
+        ← button state<br>
+        ↓ (10s later)<br>
+        <span style="color:#fafafa">redirect → /roast/abc123</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Immediate redirect to a loading results page</h3>
+      <p>
+        Click submits instantly, user is redirected right away to
+        <code>/roast/[id]</code>
+        which shows a skeleton/loading state. The page polls or revalidates
+        until the roast is ready, then reveals the result.
+      </p>
+      <div
+        style="margin-top:12px;padding:12px;background:#111;border:1px solid #2a2a2a;font-family:monospace;font-size:12px;color:#6b7280"
+      >
+        [home page]<br>
+        <span style="color:#10b981">$ roast_my_code</span>
+        → redirect immediately<br>
+        ↓<br>
+        <span style="color:#fafafa">/roast/abc123</span>
+        ← skeleton screen<br>
+        <span style="color:#10b981">↓ polling / revalidate</span><br>
+        <span style="color:#fafafa">results appear</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Streaming results page</h3>
+      <p>
+        Redirect immediately to <code>/roast/[id]</code>. The AI response
+        streams in — score, verdict, issues appear progressively as they're
+        generated. Most dynamic, most complex to build.
+      </p>
+      <div
+        style="margin-top:12px;padding:12px;background:#111;border:1px solid #2a2a2a;font-family:monospace;font-size:12px;color:#6b7280"
+      >
+        [home page] → redirect immediately<br>
+        ↓<br>
+        <span style="color:#fafafa">/roast/abc123</span><br>
+        <span style="color:#f59e0b">score: ...</span>
+        ← streams in<br>
+        <span style="color:#ef4444">verdict: ...</span>
+        ← streams in<br>
+        <span style="color:#10b981">issues: [...]</span>
+        ← streams in
+      </div>
+    </div>
+  </div>
+</div>

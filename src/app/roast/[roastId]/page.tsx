@@ -1,7 +1,9 @@
+import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import type { BundledLanguage } from "shiki";
-import { codeToHtml } from "shiki";
-import { caller } from "@/trpc/server";
+import { cachedHighlight } from "@/app/lib/cached-highlight";
+import { staticCaller } from "@/trpc/server";
 import { AnalysisCard } from "../../components/ui/analysis-card";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
@@ -12,6 +14,7 @@ import {
 } from "../../components/ui/code-block";
 import { DiffLine } from "../../components/ui/diff-line";
 import { ScoreRing } from "../../components/ui/score-ring";
+import { RoastPendingView } from "./roast-pending-view";
 
 // --- Verdict → Badge severity mapping ---
 
@@ -43,19 +46,22 @@ function Divider() {
   return <div className="h-px w-full bg-border-primary" />;
 }
 
-// --- Page ---
+// --- Cached content component ---
 
-export default async function RoastResultsPage({
-  params,
-}: {
-  params: Promise<{ roastId: string }>;
-}) {
-  const { roastId } = await params;
+async function CachedRoastContent({ roastId }: { roastId: string }) {
+  "use cache";
+  cacheLife("max");
+  cacheTag(`roast-${roastId}`);
 
-  let roast: Awaited<ReturnType<typeof caller.submission.getById>>;
+  let roast: Awaited<ReturnType<typeof staticCaller.submission.getById>>;
   try {
-    roast = await caller.submission.getById({ id: roastId });
+    roast = await staticCaller.submission.getById({ id: roastId });
   } catch {
+    notFound();
+  }
+
+  // Guard nullable AI fields — these are always populated when status is 'done'
+  if (!(roast.score && roast.verdict && roast.roastQuote)) {
     notFound();
   }
 
@@ -63,10 +69,7 @@ export default async function RoastResultsPage({
   const severity = verdictSeverityMap[roast.verdict] ?? "warning";
   const language = roast.language as BundledLanguage;
 
-  const html = await codeToHtml(roast.code, {
-    lang: language,
-    theme: "vesper",
-  });
+  const html = await cachedHighlight(roast.code, language);
 
   return (
     <main className="flex flex-col gap-10 px-20 py-10">
@@ -170,4 +173,57 @@ export default async function RoastResultsPage({
       )}
     </main>
   );
+}
+
+// --- Page ---
+
+export default async function RoastResultsPage({
+  params,
+}: {
+  params: Promise<{ roastId: string }>;
+}) {
+  const { roastId } = await params;
+  return (
+    <Suspense fallback={<RoastPendingView />}>
+      <RoastStatusGate roastId={roastId} />
+    </Suspense>
+  );
+}
+
+// Wrapped in Suspense above — safe to do uncached DB access here
+async function RoastStatusGate({ roastId }: { roastId: string }) {
+  const statusResult = await staticCaller.submission.getStatusById({
+    id: roastId,
+  });
+
+  if (!statusResult) {
+    notFound();
+  }
+
+  if (statusResult.status === "pending") {
+    return <RoastPendingView />;
+  }
+
+  if (statusResult.status === "failed") {
+    return (
+      <main className="flex flex-col items-center justify-center gap-4 px-20 py-20">
+        <span className="font-bold font-primary text-3xl text-accent-red">
+          {">"}
+        </span>
+        <h1 className="font-bold font-primary text-text-primary text-xl">
+          roast_failed
+        </h1>
+        <p className="font-secondary text-sm text-text-secondary">
+          {"// the AI couldn't process your code. try again."}
+        </p>
+        {statusResult.errorMessage && (
+          <p className="max-w-lg break-words font-secondary text-accent-red text-xs">
+            {statusResult.errorMessage}
+          </p>
+        )}
+      </main>
+    );
+  }
+
+  return <CachedRoastContent roastId={roastId} />;
 }

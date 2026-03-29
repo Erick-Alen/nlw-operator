@@ -95,6 +95,35 @@ export function MyStats({ value }: { value: number }) {
 - Add `"use client"` only when the component uses hooks, browser APIs, or event handlers.
 - Interactive wrappers (providers, animated displays) are client components; their async data comes from server-side props passed down from a Loader.
 
+## Caching Strategy
+
+Components that fetch from the DB use the `"use cache"` directive.
+
+### Rules
+
+- **`caller` is FORBIDDEN inside `use cache`** — it calls `headers()` which throws. Use `staticCaller` from `@/trpc/server` instead.
+- Loader components use `cacheLife("minutes")` + `cacheTag("leaderboard")`.
+- Immutable content (roast results) uses `cacheLife("static")` + per-resource tag: `cacheTag(\`roast-\${roastId}\`)`.
+- shiki output is cached via `cachedHighlight()` in `@/app/lib/cached-highlight.ts`. Never call `codeToHtml` directly in components.
+- Cache invalidation: call `revalidateTag("leaderboard")` after any submission is saved (in the tRPC mutation or server action).
+
+### Pattern
+
+```tsx
+// my-feature-loader.tsx
+import { cacheLife, cacheTag } from "next/cache";
+import { staticCaller } from "@/trpc/server";
+
+export async function MyFeatureLoader() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("leaderboard");
+
+  const data = await staticCaller.myRouter.myProcedure();
+  return <MyFeature data={data} />;
+}
+```
+
 ## Dynamic Routes
 
 - Use `caller` in the page to fetch by ID, then call `notFound()` if the resource is missing:
