@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+
+export const dynamic = "force-dynamic";
+
 import type { BundledLanguage } from "shiki";
 import { cachedHighlight } from "@/app/lib/cached-highlight";
 import { staticCaller } from "@/trpc/server";
