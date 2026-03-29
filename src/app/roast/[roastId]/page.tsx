@@ -1,6 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
+import { Suspense } from "react";
 import type { BundledLanguage } from "shiki";
 import { cachedHighlight } from "@/app/lib/cached-highlight";
 import { staticCaller } from "@/trpc/server";
@@ -183,9 +183,15 @@ export default async function RoastResultsPage({
   params: Promise<{ roastId: string }>;
 }) {
   const { roastId } = await params;
-  await connection(); // opt into dynamic rendering for uncached status check
+  return (
+    <Suspense fallback={<RoastPendingView />}>
+      <RoastStatusGate roastId={roastId} />
+    </Suspense>
+  );
+}
 
-  // Status check — NOT cached, runs on every request
+// Wrapped in Suspense above — safe to do uncached DB access here
+async function RoastStatusGate({ roastId }: { roastId: string }) {
   const statusResult = await staticCaller.submission.getStatusById({
     id: roastId,
   });

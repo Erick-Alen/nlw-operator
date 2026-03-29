@@ -39,11 +39,12 @@ async function ShameLeaderboardEntry({
   });
 
   return (
-    <div
+    <Link
       className={cn(
-        "flex flex-col border-border-primary border-b",
+        "flex flex-col border-border-primary border-b transition-colors duration-150 hover:bg-bg-elevated",
         isLast && "border-b-0"
       )}
+      href={`/roast/${entry.id}`}
     >
       {/* Meta row */}
       <div className="flex items-center gap-4 px-5 py-3">
@@ -71,7 +72,7 @@ async function ShameLeaderboardEntry({
 
       {/* Syntax-highlighted code, expandable */}
       <ExpandableCode html={html} lineCount={lineCount} />
-    </div>
+    </Link>
   );
 }
 

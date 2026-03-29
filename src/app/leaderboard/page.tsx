@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
+import Link from "next/link";
 import { Suspense } from "react";
 import type { BundledLanguage } from "shiki";
 import { cachedHighlight } from "@/app/lib/cached-highlight";
@@ -14,6 +15,7 @@ import { ExpandableCode } from "../components/ui/expandable-code";
 
 interface EntryCardProps {
   code: string;
+  id: string;
   language: BundledLanguage;
   lineCount: number;
   rank: number;
@@ -24,34 +26,39 @@ async function EntryCard({ entry }: { entry: EntryCardProps }) {
   const html = await cachedHighlight(entry.code, entry.language);
 
   return (
-    <CodeBlockRoot>
-      <CodeBlockHeader className="h-12 justify-between px-5">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <CodeBlockMeta>#</CodeBlockMeta>
-            <span className="font-bold font-primary text-accent-amber text-sm">
-              {entry.rank}
-            </span>
+    <Link
+      className="transition-colors duration-150 hover:bg-bg-elevated"
+      href={`/roast/${entry.id}`}
+    >
+      <CodeBlockRoot>
+        <CodeBlockHeader className="h-12 justify-between px-5">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <CodeBlockMeta>#</CodeBlockMeta>
+              <span className="font-bold font-primary text-accent-amber text-sm">
+                {entry.rank}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CodeBlockMeta>score:</CodeBlockMeta>
+              <span className="font-bold font-primary text-accent-red text-sm">
+                {entry.score}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <CodeBlockMeta>score:</CodeBlockMeta>
-            <span className="font-bold font-primary text-accent-red text-sm">
-              {entry.score}
-            </span>
+          <div className="flex items-center gap-3">
+            <CodeBlockMeta className="text-text-secondary">
+              {entry.language}
+            </CodeBlockMeta>
+            <CodeBlockMeta>
+              {entry.lineCount} {entry.lineCount === 1 ? "line" : "lines"}
+            </CodeBlockMeta>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <CodeBlockMeta className="text-text-secondary">
-            {entry.language}
-          </CodeBlockMeta>
-          <CodeBlockMeta>
-            {entry.lineCount} {entry.lineCount === 1 ? "line" : "lines"}
-          </CodeBlockMeta>
-        </div>
-      </CodeBlockHeader>
+        </CodeBlockHeader>
 
-      <ExpandableCode html={html} lineCount={entry.lineCount} />
-    </CodeBlockRoot>
+        <ExpandableCode html={html} lineCount={entry.lineCount} />
+      </CodeBlockRoot>
+    </Link>
   );
 }
 
@@ -117,6 +124,7 @@ async function LeaderboardEntriesLoader() {
         {entries.map((entry, i) => (
           <EntryCard
             entry={{
+              id: entry.id,
               rank: i + 1,
               score: entry.score ?? "0",
               language: entry.language as BundledLanguage,
