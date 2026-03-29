@@ -5,7 +5,7 @@ import { z } from "zod"; // use "zod" not "zod/v4" — Vercel AI SDK expects sta
 import { env } from "@/app/config/env";
 
 const google = createGoogleGenerativeAI({
-  apiKey: env.GOOGLE_GENERATIVE_AI_API_KEY,
+  apiKey: env.AI_API_KEY,
 });
 
 const roastOutputSchema = z.object({
@@ -104,6 +104,7 @@ export async function roastAi(
     model: google("gemini-2.0-flash"),
     schema: roastOutputSchema,
     prompt: buildPrompt(code, language, roastMode),
+    maxRetries: 0,
   });
 
   return object;
