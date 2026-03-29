@@ -100,8 +100,9 @@ export async function roastAi(
   language: string,
   roastMode: boolean
 ): Promise<RoastOutput> {
+  console.log("chegou aqui", buildPrompt(code, language, roastMode));
   const result = await generateText({
-    model: google("gemini-2.0-flash"),
+    model: google("gemini-3-flash-preview"),
     output: Output.object({ schema: roastOutputSchema }),
     prompt: buildPrompt(code, language, roastMode),
     maxRetries: 0,

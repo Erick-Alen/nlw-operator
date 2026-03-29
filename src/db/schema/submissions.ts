@@ -26,6 +26,8 @@ export const submissions = pgTable(
     verdict: verdictEnum("verdict"),
     roastQuote: text("roast_quote"),
 
+    errorMessage: text("error_message"),
+
     shareToken: text("share_token"),
 
     createdAt: timestamp("created_at", { withTimezone: true })

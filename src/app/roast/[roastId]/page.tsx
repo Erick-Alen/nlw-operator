@@ -50,7 +50,7 @@ function Divider() {
 
 async function CachedRoastContent({ roastId }: { roastId: string }) {
   "use cache";
-  cacheLife("static");
+  cacheLife("max");
   cacheTag(`roast-${roastId}`);
 
   let roast: Awaited<ReturnType<typeof staticCaller.submission.getById>>;
@@ -210,6 +210,11 @@ export default async function RoastResultsPage({
         <p className="font-secondary text-sm text-text-secondary">
           {"// the AI couldn't process your code. try again."}
         </p>
+        {statusResult.errorMessage && (
+          <p className="max-w-lg break-words font-secondary text-accent-red text-xs">
+            {statusResult.errorMessage}
+          </p>
+        )}
       </main>
     );
   }

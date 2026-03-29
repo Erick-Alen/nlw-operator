@@ -35,8 +35,14 @@ export async function submitCode(rawInput: SubmitInput) {
 
   // Process AI in background, after the response is sent to the client
   after(async () => {
+    console.log("[submit] after() started for submission", submission.id);
     try {
+      console.log("[submit] calling roastAi...");
       const roast = await roastAi(input.code, input.language, input.roastMode);
+      console.log("[submit] roastAi returned", {
+        score: roast.score,
+        verdict: roast.verdict,
+      });
 
       // Insert issues
       await db.insert(issues).values(
@@ -83,10 +89,12 @@ export async function submitCode(rawInput: SubmitInput) {
       // Bust caches
       revalidateTag("leaderboard", "max");
       revalidateTag(`roast-${submission.id}`, "max");
-    } catch {
+    } catch (err) {
+      console.error("[submit] roastAi failed:", err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
       await db
         .update(submissions)
-        .set({ status: "failed" })
+        .set({ status: "failed", errorMessage })
         .where(eq(submissions.id, submission.id));
     }
   });

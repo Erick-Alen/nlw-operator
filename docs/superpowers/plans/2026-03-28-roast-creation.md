@@ -16,7 +16,7 @@
 |------|--------|----------------|
 | `src/db/schema/enums.ts` | Modify | Add `submissionStatusEnum` ('pending' \| 'done' \| 'failed') |
 | `src/db/schema/submissions.ts` | Modify | Add `status` column; make `score`, `verdict`, `roastQuote` nullable |
-| `src/app/config/env.ts` | Modify | Add `GOOGLE_GENERATIVE_AI_API_KEY` |
+| `src/app/config/env.ts` | Modify | Add `AI_API_KEY` |
 | `src/app/lib/roast-ai.ts` | Create | `roastAi()` — calls Gemini with `generateObject`, returns typed roast output |
 | `src/app/actions/submit.ts` | Create | `submitCode()` server action — inserts pending submission, schedules AI via `after()` |
 | `src/trpc/routers/submission.ts` | Modify | Add `getStatusById` procedure for non-cached status polling |
@@ -160,7 +160,7 @@ import { z } from "zod/v4";
 
 const envSchema = z.object({
   DATABASE_URL: z.url(),
-  GOOGLE_GENERATIVE_AI_API_KEY: z.string().min(1),
+  AI_API_KEY: z.string().min(1),
 });
 
 export const env = envSchema.parse(process.env);
@@ -170,7 +170,7 @@ export const env = envSchema.parse(process.env);
 
 ```bash
 # Add to .env:
-GOOGLE_GENERATIVE_AI_API_KEY=your_api_key_here
+AI_API_KEY=your_api_key_here
 ```
 
 Get the key from https://aistudio.google.com/app/apikey
@@ -179,7 +179,7 @@ Get the key from https://aistudio.google.com/app/apikey
 
 Add this line to `.env.example`:
 ```
-GOOGLE_GENERATIVE_AI_API_KEY=
+AI_API_KEY=
 ```
 
 - [ ] **Step 4: Install AI SDK packages**
@@ -196,7 +196,7 @@ Expected: `ai` and `@ai-sdk/google` appear in `package.json` dependencies.
 pnpm dev
 ```
 
-Expected: Server starts without `GOOGLE_GENERATIVE_AI_API_KEY` env error.
+Expected: Server starts without `AI_API_KEY` env error.
 
 - [ ] **Step 6: Commit**
 
@@ -224,7 +224,7 @@ import { z } from "zod"; // use "zod" not "zod/v4" — Vercel AI SDK expects sta
 import { env } from "@/app/config/env";
 
 const google = createGoogleGenerativeAI({
-  apiKey: env.GOOGLE_GENERATIVE_AI_API_KEY,
+  apiKey: env.AI_API_KEY,
 });
 
 const roastOutputSchema = z.object({

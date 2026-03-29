@@ -15,6 +15,13 @@
       "when": 1774725487832,
       "tag": "0001_wonderful_vector",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774753264987,
+      "tag": "0002_wet_redwing",
+      "breakpoints": true
     }
   ]
 }

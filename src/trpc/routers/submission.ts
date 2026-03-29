@@ -34,7 +34,11 @@ export const submissionRouter = createTRPCRouter({
     .input(z.object({ id: z.uuid() }))
     .query(async ({ ctx, input }) => {
       const result = await ctx.db
-        .select({ id: submissions.id, status: submissions.status })
+        .select({
+          id: submissions.id,
+          status: submissions.status,
+          errorMessage: submissions.errorMessage,
+        })
         .from(submissions)
         .where(eq(submissions.id, input.id))
         .limit(1);
