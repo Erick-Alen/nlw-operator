@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import type { BundledLanguage } from "shiki";
 import { cachedHighlight } from "@/app/lib/cached-highlight";
 import { staticCaller } from "@/trpc/server";
@@ -182,6 +183,7 @@ export default async function RoastResultsPage({
   params: Promise<{ roastId: string }>;
 }) {
   const { roastId } = await params;
+  await connection(); // opt into dynamic rendering for uncached status check
 
   // Status check — NOT cached, runs on every request
   const statusResult = await staticCaller.submission.getStatusById({
