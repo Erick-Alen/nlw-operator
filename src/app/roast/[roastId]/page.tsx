@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -6,7 +7,6 @@ import { cachedHighlight } from "@/app/lib/cached-highlight";
 import { staticCaller } from "@/trpc/server";
 import { AnalysisCard } from "../../components/ui/analysis-card";
 import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
 import {
   CodeBlockBody,
   CodeBlockHeader,
@@ -15,6 +15,45 @@ import {
 import { DiffLine } from "../../components/ui/diff-line";
 import { ScoreRing } from "../../components/ui/score-ring";
 import { RoastPendingView } from "./roast-pending-view";
+import { ShareButton } from "./share-button";
+
+// --- generateMetadata ---
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ roastId: string }>;
+}): Promise<Metadata> {
+  const { roastId } = await params;
+
+  const statusResult = await staticCaller.submission
+    .getStatusById({ id: roastId })
+    .catch(() => null);
+
+  if (!statusResult || statusResult.status !== "done") {
+    return {};
+  }
+
+  const roast = await staticCaller.submission
+    .getById({ id: roastId })
+    .catch(() => null);
+
+  if (!(roast?.score && roast.verdict && roast.roastQuote)) {
+    return {};
+  }
+
+  const title = `${Number(roast.score).toFixed(1)}/10 · ${roast.verdict.replace(/_/g, " ")} — devroast`;
+  const description = roast.roastQuote;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+    },
+  };
+}
 
 // --- Verdict → Badge severity mapping ---
 
@@ -94,7 +133,7 @@ async function CachedRoastContent({ roastId }: { roastId: string }) {
             </span>
           </div>
           <div>
-            <Button variant="secondary">{"$ share_roast"}</Button>
+            <ShareButton roastId={roastId} />
           </div>
         </div>
       </section>

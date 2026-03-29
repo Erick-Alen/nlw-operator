@@ -65,6 +65,9 @@ importers:
       tailwind-merge:
         specifier: ^3.5.0
         version: 3.5.0
+      takumi-js:
+        specifier: ^0.0.0
+        version: 0.0.0
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -1705,6 +1708,9 @@ packages:
   tailwindcss@4.2.1:
     resolution: {integrity: sha512-/tBrSQ36vCleJkAOsy9kbNTgaxvGbyOamC30PRePTQe/o1MFwEKHQk4Cn7BNGaPtjp+PuUrByJehM1hgxfq4sw==}
 
+  takumi-js@0.0.0:
+    resolution: {integrity: sha512-4da27LpT/AnmHsckqYZUqJDMlJ17yYUB0qJAJt3QkNntRYTVw9qDQ+4z3C4NKWDhzj15LoM+6OfPsx5RZuhsew==}
+
   tapable@2.3.0:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
@@ -2995,6 +3001,8 @@ snapshots:
   tailwind-merge@3.5.0: {}
 
   tailwindcss@4.2.1: {}
+
+  takumi-js@0.0.0: {}
 
   tapable@2.3.0: {}
 
