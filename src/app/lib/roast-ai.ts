@@ -13,7 +13,6 @@ const roastOutputSchema = z.object({
     .number()
     .min(0)
     .max(10)
-    .multipleOf(0.1)
     .describe("Code quality score from 0 (worst) to 10 (best), one decimal"),
   verdict: z
     .enum([
@@ -27,13 +26,12 @@ const roastOutputSchema = z.object({
     .describe("Overall verdict label"),
   roastQuote: z
     .string()
-    .max(120)
-    .describe("One punchy sentence summarizing the review. Max 120 chars."),
+    .describe("One punchy sentence summarizing the review."),
   issues: z
     .array(
       z.object({
         severity: z.enum(["critical", "warning", "good"]),
-        title: z.string().max(50).describe("Short issue title, max 50 chars"),
+        title: z.string().describe("Short issue title"),
         description: z
           .string()
           .describe("Actionable explanation, 1-2 sentences"),
