@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ComponentProps } from "react";
 import { cn } from "./cn";
 
@@ -29,14 +30,14 @@ export function NavbarLogo({
   return (
     <div className={cn("flex items-center gap-2", className)} {...props}>
       {children ?? (
-        <>
+        <Link className="flex items-center gap-2" href="/">
           <span className="font-bold font-primary text-accent-green text-xl">
             {">"}
           </span>
           <span className="font-medium font-primary text-lg text-text-primary">
             devroast
           </span>
-        </>
+        </Link>
       )}
     </div>
   );

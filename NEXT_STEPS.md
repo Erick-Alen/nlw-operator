@@ -1,0 +1,2 @@
+- Add diffs by pierre library to enhance code diffs for the AI's recommended code suggestions
+- 
