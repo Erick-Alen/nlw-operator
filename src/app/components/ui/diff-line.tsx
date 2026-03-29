@@ -4,7 +4,7 @@ import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 import type { ComponentProps } from "react";
 import type { BundledLanguage } from "shiki";
-import { codeToHtml } from "shiki";
+import { cachedHighlight } from "@/app/lib/cached-highlight";
 import { cn } from "./cn";
 
 const diffLineVariants = cva(
@@ -49,10 +49,7 @@ export async function DiffLine({
   type = "context",
   ...props
 }: DiffLineProps) {
-  const highlighted = await codeToHtml(content, {
-    lang: language,
-    theme: "vesper",
-  });
+  const highlighted = await cachedHighlight(content, language);
 
   const resolvedType = type ?? "context";
 

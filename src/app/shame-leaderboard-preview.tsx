@@ -1,7 +1,7 @@
 import type { InferSelectModel } from "drizzle-orm";
 import Link from "next/link";
 import type { BundledLanguage } from "shiki";
-import { codeToHtml } from "shiki";
+import { cachedHighlight } from "@/app/lib/cached-highlight";
 import type { submissions } from "@/db/schema";
 import { Button } from "./components/ui/button";
 import { cn } from "./components/ui/cn";
@@ -33,10 +33,10 @@ async function ShameLeaderboardEntry({
 }: ShameLeaderboardEntryProps) {
   const lineCount = entry.lineCount || entry.code.split("\n").length;
 
-  const html = await codeToHtml(entry.code, {
-    lang: entry.language as BundledLanguage,
-    theme: "vesper",
-  });
+  const html = await cachedHighlight(
+    entry.code,
+    entry.language as BundledLanguage
+  );
 
   return (
     <Link
