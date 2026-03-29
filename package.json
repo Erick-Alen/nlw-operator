@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome lint",
-    "check": "biome check",
+    "check": "biome check && tsc --noEmit",
     "fix": "biome check --write",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

@@ -1,6 +1,6 @@
 // src/app/lib/roast-ai.ts
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateText } from "ai";
+import { generateText, Output } from "ai";
 import { z } from "zod"; // use "zod" not "zod/v4" — Vercel AI SDK expects standard Zod schema
 import { env } from "@/app/config/env";
 
@@ -100,12 +100,12 @@ export async function roastAi(
   language: string,
   roastMode: boolean
 ): Promise<RoastOutput> {
-  const { object } = await generateText({
+  const result = await generateText({
     model: google("gemini-2.0-flash"),
-    output: roastOutputSchema,
+    output: Output.object({ schema: roastOutputSchema }),
     prompt: buildPrompt(code, language, roastMode),
     maxRetries: 0,
   });
 
-  return object;
+  return result.output;
 }
