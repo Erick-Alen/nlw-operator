@@ -76,11 +76,11 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 async function CodeBlockComposedDemo() {
-  const { codeToHtml } = await import("shiki");
-  const html = await codeToHtml('const greeting = "hello world";', {
-    lang: "javascript",
-    theme: "vesper",
-  });
+  const { cachedHighlight } = await import("@/app/lib/cached-highlight");
+  const html = await cachedHighlight(
+    'const greeting = "hello world";',
+    "javascript"
+  );
 
   return (
     <CodeBlockRoot>
