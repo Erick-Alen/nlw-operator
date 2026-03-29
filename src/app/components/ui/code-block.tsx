@@ -2,7 +2,7 @@ import "server-only";
 
 import type { ComponentProps } from "react";
 import type { BundledLanguage } from "shiki";
-import { codeToHtml } from "shiki";
+import { cachedHighlight } from "@/app/lib/cached-highlight";
 import { cn } from "./cn";
 
 // --- Composable parts ---
@@ -108,10 +108,7 @@ export async function CodeBlock({
   const lines = code.split("\n");
   const displayLineCount = lineCount ?? lines.length;
 
-  const highlighted = await codeToHtml(code, {
-    lang: language,
-    theme: "vesper",
-  });
+  const highlighted = await cachedHighlight(code, language);
 
   return (
     <CodeBlockRoot className={className} {...props}>
